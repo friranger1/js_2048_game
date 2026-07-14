@@ -21,24 +21,149 @@ class Game {
    * initial state.
    */
   constructor(initialState) {
+    if (initialState) {
+      this.board =
+        typeof structuredClone === 'function'
+          ? structuredClone(initialState)
+          : initialState.map((row) => [...row]);
+    } else {
+      this.board = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ];
+    }
+    this.score = 0;
+    this.status = 'idle';
     // eslint-disable-next-line no-console
     console.log(initialState);
   }
 
-  moveLeft() {}
-  moveRight() {}
-  moveUp() {}
-  moveDown() {}
+  moveLeft() {
+    for (let i = 0; i < this.board.length; i++) {
+      const filtered = this.board[i].filter((elem) => elem !== 0);
+
+      for (let c = 0; c < filtered.length - 1; c++) {
+        if (filtered[c] === filtered[c + 1]) {
+          filtered[c] *= 2;
+          this.score += filtered[c];
+          filtered[c + 1] = 0;
+          c++;
+        }
+      }
+
+      this.board[i] = filtered.filter((elem) => elem !== 0);
+
+      while (this.board[i].length < this.board.length) {
+        this.board[i].push(0);
+      }
+    }
+  }
+
+  moveRight() {
+    for (let i = 0; i < this.board.length; i++) {
+      const filtered = this.board[i].filter((elem) => elem !== 0);
+
+      for (let c = filtered.length - 1; c > 0; c--) {
+        if (filtered[c] === filtered[c - 1]) {
+          filtered[c] *= 2;
+          this.score += filtered[c];
+          filtered[c - 1] = 0;
+          c--;
+        }
+      }
+
+      this.board[i] = filtered.filter((elem) => elem !== 0);
+
+      while (this.board[i].length < this.board.length) {
+        this.board[i].unshift(0);
+      }
+    }
+  }
+
+  moveUp() {
+    const tempArr = Array.from({ length: this.board.length }, () => []);
+
+    for (let r = 0; r < this.board.length; r++) {
+      for (let c = 0; c < this.board[r].length; c++) {
+        tempArr[c].push(this.board[r][c]);
+      }
+    }
+
+    for (let i = 0; i < tempArr.length; i++) {
+      const filtered = tempArr[i].filter((elem) => elem !== 0);
+
+      for (let c = 0; c < filtered.length - 1; c++) {
+        if (filtered[c] === filtered[c + 1]) {
+          filtered[c] *= 2;
+          this.score += filtered[c];
+          filtered[c + 1] = 0;
+          c++;
+        }
+      }
+
+      tempArr[i] = filtered.filter((elem) => elem !== 0);
+
+      while (tempArr[i].length < this.board.length) {
+        tempArr[i].push(0);
+      }
+    }
+
+    for (let i = 0; i < tempArr.length; i++) {
+      for (let c = 0; c < tempArr[i].length; c++) {
+        this.board[c][i] = tempArr[i][c];
+      }
+    }
+  }
+  moveDown() {
+    const tempArr = Array.from({ length: this.board.length }, () => []);
+
+    for (let r = 0; r < this.board.length; r++) {
+      for (let c = 0; c < this.board[r].length; c++) {
+        tempArr[c].push(this.board[r][c]);
+      }
+    }
+
+    for (let i = 0; i < tempArr.length; i++) {
+      const filtered = tempArr[i].filter((elem) => elem !== 0);
+
+      for (let c = filtered.length - 1; c > 0 - 1; c--) {
+        if (filtered[c] === filtered[c - 1]) {
+          filtered[c] *= 2;
+          this.score += filtered[c];
+          filtered[c - 1] = 0;
+          c--;
+        }
+      }
+
+      tempArr[i] = filtered.filter((elem) => elem !== 0);
+
+      while (tempArr[i].length < this.board.length) {
+        tempArr[i].unshift(0);
+      }
+    }
+
+    for (let i = 0; i < tempArr.length; i++) {
+      for (let c = 0; c < tempArr[i].length; c++) {
+        this.board[c][i] = tempArr[i][c];
+      }
+    }
+  }
 
   /**
    * @returns {number}
    */
-  getScore() {}
+  getScore() {
+    return this.score;
+  }
 
   /**
    * @returns {number[][]}
    */
-  getState() {}
+  getState() {
+    return this.board;
+  }
 
   /**
    * Returns the current game status.
@@ -50,19 +175,55 @@ class Game {
    * `win` - the game is won;
    * `lose` - the game is lost
    */
-  getStatus() {}
+  getStatus() {
+    return this.status;
+  }
 
   /**
    * Starts the game.
    */
-  start() {}
+  start() {
+    this.status = 'playing';
+
+    const hasEmptyCells = this.board.flat().some((elem) => elem === 0);
+
+    if (hasEmptyCells) {
+      this.addRandomTile();
+      this.addRandomTile();
+    }
+  }
 
   /**
    * Resets the game.
    */
-  restart() {}
+  restart() {
+    this.start();
+  }
 
   // Add your own methods here
+  addRandomTile() {
+    const emptyCells = [];
+
+    for (let r = 0; r < this.board.length; r++) {
+      for (let c = 0; c < this.board[r].length; c++) {
+        if (this.board[r][c] === 0) {
+          emptyCells.push({ row: r, col: c });
+        }
+      }
+    }
+
+    if (emptyCells.length === 0) {
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+
+    const { row, col } = emptyCells[randomIndex];
+    const value = Math.random() < 0.1 ? 4 : 2;
+
+    this.board[row][col] = value;
+  }
 }
 
 module.exports = Game;
+module.exports.default = Game;
