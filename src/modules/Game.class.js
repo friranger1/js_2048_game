@@ -36,8 +36,13 @@ class Game {
     }
     this.score = 0;
     this.status = 'idle';
+    this.recentTiles = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
     // eslint-disable-next-line no-console
-    console.log(initialState);
   }
 
   moveLeft() {
@@ -116,6 +121,7 @@ class Game {
       }
     }
   }
+
   moveDown() {
     const tempArr = Array.from({ length: this.board.length }, () => []);
 
@@ -128,7 +134,7 @@ class Game {
     for (let i = 0; i < tempArr.length; i++) {
       const filtered = tempArr[i].filter((elem) => elem !== 0);
 
-      for (let c = filtered.length - 1; c > 0 - 1; c--) {
+      for (let c = filtered.length - 1; c > 0; c--) {
         if (filtered[c] === filtered[c - 1]) {
           filtered[c] *= 2;
           this.score += filtered[c];
@@ -156,6 +162,19 @@ class Game {
    */
   getScore() {
     return this.score;
+  }
+
+  getRecentTiles() {
+    return this.recentTiles;
+  }
+
+  resetRecentTiles() {
+    this.recentTiles = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
   }
 
   /**
@@ -197,6 +216,13 @@ class Game {
    * Resets the game.
    */
   restart() {
+    this.board = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
+
     this.start();
   }
 
@@ -222,6 +248,7 @@ class Game {
     const value = Math.random() < 0.1 ? 4 : 2;
 
     this.board[row][col] = value;
+    this.recentTiles[row][col] = value;
   }
 }
 

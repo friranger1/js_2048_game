@@ -10,12 +10,50 @@ const score = document.querySelector('.game-score');
 
 score.textContent = game.score;
 
-startButton.addEventListener('click', () => {
-  if (game.status === 'playing') {
-    return;
+const moves = {
+  ArrowLeft: () => game.moveLeft(),
+  ArrowRight: () => game.moveRight(),
+  ArrowUp: () => game.moveUp(),
+  ArrowDown: () => game.moveDown(),
+};
+
+function render() {
+  const cells = document.querySelectorAll('.field-cell');
+  const flatBoard = game.board.flat();
+
+  for (let i = 0; i < flatBoard.length; i++) {
+    const value = flatBoard[i];
+
+    cells[i].textContent = value === 0 ? '' : value;
+    cells[i].className = `field-cell field-cell--${value}`;
   }
 
-  game.start();
+  score.textContent = game.score;
+}
+
+function animateRecentTiles() {
+  const cells = document.querySelectorAll('.field-cell');
+  const recentTiles = game.recentTiles.flat();
+
+  for (let i = 0; i < recentTiles.length; i++) {
+    if (recentTiles[i] !== 0) {
+      cells[i].classList.add('field-cell--new');
+    }
+  }
+}
+
+startButton.addEventListener('click', () => {
+  if (game.status === 'idle') {
+    game.start();
+    startButton.textContent = 'Restart';
+    startButton.classList.remove('start');
+    startButton.classList.add('restart');
+  } else {
+    game.restart();
+  }
+
+  render();
+  animateRecentTiles();
 
   const container = document.querySelectorAll('.field-cell');
 
@@ -28,63 +66,34 @@ startButton.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (keyboardEvent) => {
-  if (keyboardEvent.key === 'left' || keyboardEvent.key === 'ArrowLeft') {
-    game.moveLeft();
-
-    const container = document.querySelectorAll('.field-cell');
-
-    for (let i = 0; i < game.board.flat().length; i++) {
-      const value = game.board.flat()[i];
-
-      container[i].textContent = value === 0 ? '' : value;
-      container[i].className = `field-cell field-cell--${value}`;
-    }
-    score.textContent = game.score;
-    game.addRandomTile();
+  if (game.status !== 'playing') {
+    return;
   }
 
-  if (keyboardEvent.key === 'right' || keyboardEvent.key === 'ArrowRight') {
-    game.moveRight();
+  const move = moves[keyboardEvent.key];
 
-    const container = document.querySelectorAll('.field-cell');
-
-    for (let i = 0; i < game.board.flat().length; i++) {
-      const value = game.board.flat()[i];
-
-      container[i].textContent = value === 0 ? '' : value;
-      container[i].className = `field-cell field-cell--${value}`;
-    }
-    score.textContent = game.score;
-    game.addRandomTile();
+  if (!move) {
+    return;
   }
 
-  if (keyboardEvent.key === 'up' || keyboardEvent.key === 'ArrowUp') {
-    game.moveUp();
+  const boardCopy = structuredClone(game.board);
+  let boardChanged = false;
 
-    const container = document.querySelectorAll('.field-cell');
+  game.resetRecentTiles();
+  move();
 
-    for (let i = 0; i < game.board.flat().length; i++) {
-      const value = game.board.flat()[i];
-
-      container[i].textContent = value === 0 ? '' : value;
-      container[i].className = `field-cell field-cell--${value}`;
+  for (let i = 0; i < game.board.flat().length; i++) {
+    if (game.board.flat()[i] !== boardCopy.flat()[i]) {
+      boardChanged = true;
+      break;
     }
-    score.textContent = game.score;
-    game.addRandomTile();
   }
 
-  if (keyboardEvent.key === 'down' || keyboardEvent.key === 'ArrowDown') {
-    game.moveDown();
-
-    const container = document.querySelectorAll('.field-cell');
-
-    for (let i = 0; i < game.board.flat().length; i++) {
-      const value = game.board.flat()[i];
-
-      container[i].textContent = value === 0 ? '' : value;
-      container[i].className = `field-cell field-cell--${value}`;
-    }
-    score.textContent = game.score;
-    game.addRandomTile();
+  if (!boardChanged) {
+    return;
   }
+
+  game.addRandomTile();
+  render();
+  animateRecentTiles();
 });
