@@ -3,10 +3,29 @@
 import Game from '../modules/Game.class.js';
 
 const game = new Game();
-
 const startButton = document.querySelector('.button.start');
-
 const score = document.querySelector('.game-score');
+const messageStart = document.querySelector('.message-start');
+const messageLose = document.querySelector('.message-lose');
+const messageWin = document.querySelector('.message-win');
+
+function showMessage() {
+  messageStart.classList.add('hidden');
+  messageLose.classList.add('hidden');
+  messageWin.classList.add('hidden');
+
+  if (game.status === 'idle') {
+    messageStart.classList.remove('hidden');
+  }
+
+  if (game.status === 'win') {
+    messageWin.classList.remove('hidden');
+  }
+
+  if (game.status === 'lose') {
+    messageLose.classList.remove('hidden');
+  }
+}
 
 score.textContent = game.score;
 
@@ -28,6 +47,7 @@ function render() {
     cells[i].className = `field-cell field-cell--${value}`;
   }
 
+  showMessage();
   score.textContent = game.score;
 }
 
@@ -94,6 +114,7 @@ document.addEventListener('keydown', (keyboardEvent) => {
   }
 
   game.addRandomTile();
+  game.updateStatus();
   render();
   animateRecentTiles();
 });

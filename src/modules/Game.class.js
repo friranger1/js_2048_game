@@ -36,6 +36,7 @@ class Game {
     }
     this.score = 0;
     this.status = 'idle';
+
     this.recentTiles = [
       [0, 0, 0, 0],
       [0, 0, 0, 0],
@@ -249,6 +250,52 @@ class Game {
 
     this.board[row][col] = value;
     this.recentTiles[row][col] = value;
+  }
+
+  checkWin() {
+    if (this.board.flat().some((elem) => +elem >= 2048)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  hasAvailableMoves() {
+    for (let i = 0; i < this.board.length; i++) {
+      for (let j = 0; j < this.board[i].length; j++) {
+        const value = this.board[i][j];
+
+        if (value === 0) {
+          return true;
+        }
+
+        if (j < this.board[i].length - 1 && value === this.board[i][j + 1]) {
+          return true;
+        }
+
+        if (i < this.board.length - 1 && value === this.board[i + 1][j]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  updateStatus() {
+    if (this.checkWin()) {
+      this.status = 'win';
+
+      return;
+    }
+
+    if (!this.hasAvailableMoves()) {
+      this.status = 'lose';
+
+      return;
+    }
+
+    this.status = 'playing';
   }
 }
 
