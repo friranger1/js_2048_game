@@ -8,6 +8,7 @@ const score = document.querySelector('.game-score');
 const messageStart = document.querySelector('.message-start');
 const messageLose = document.querySelector('.message-lose');
 const messageWin = document.querySelector('.message-win');
+const gameField = document.querySelector('.game-field');
 
 function showMessage() {
   messageStart.classList.add('hidden');
@@ -98,6 +99,73 @@ document.addEventListener('keydown', (keyboardEvent) => {
 
   const boardCopy = structuredClone(game.board);
   let boardChanged = false;
+
+  game.resetRecentTiles();
+  move();
+
+  for (let i = 0; i < game.board.flat().length; i++) {
+    if (game.board.flat()[i] !== boardCopy.flat()[i]) {
+      boardChanged = true;
+      break;
+    }
+  }
+
+  if (!boardChanged) {
+    return;
+  }
+
+  game.addRandomTile();
+  game.updateStatus();
+  render();
+  animateRecentTiles();
+});
+
+let startX;
+let startY;
+let endX;
+let endY;
+
+gameField.addEventListener('touchstart', (mobileEvent) => {
+  startX = mobileEvent.touches[0].clientX;
+  startY = mobileEvent.touches[0].clientY;
+});
+
+gameField.addEventListener('touchend', (mobileEvent) => {
+  endX = mobileEvent.changedTouches[0].clientX;
+  endY = mobileEvent.changedTouches[0].clientY;
+
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
+  let direction;
+
+  if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30) {
+    return;
+  }
+
+  if (game.status !== 'playing') {
+    return;
+  }
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0) {
+      direction = 'ArrowRight';
+    }
+    if (deltaX < 0) {
+      direction = 'ArrowLeft';
+    }
+  } else {
+    if (deltaY > 0) {
+      direction = 'ArrowDown';
+    }
+    if (deltaY < 0) {
+      direction = 'ArrowUp';
+    }
+  }
+
+  const boardCopy = structuredClone(game.board);
+  let boardChanged = false;
+
+  const move = moves[direction];
 
   game.resetRecentTiles();
   move();
