@@ -126,6 +126,7 @@ let endX;
 let endY;
 
 gameField.addEventListener('touchstart', (mobileEvent) => {
+  document.documentElement.classList.add('no-scroll');
   startX = mobileEvent.touches[0].clientX;
   startY = mobileEvent.touches[0].clientY;
 });
@@ -150,6 +151,7 @@ gameField.addEventListener('touchend', (mobileEvent) => {
     if (deltaX > 0) {
       direction = 'ArrowRight';
     }
+
     if (deltaX < 0) {
       direction = 'ArrowLeft';
     }
@@ -157,6 +159,7 @@ gameField.addEventListener('touchend', (mobileEvent) => {
     if (deltaY > 0) {
       direction = 'ArrowDown';
     }
+
     if (deltaY < 0) {
       direction = 'ArrowUp';
     }
@@ -166,6 +169,8 @@ gameField.addEventListener('touchend', (mobileEvent) => {
   let boardChanged = false;
 
   const move = moves[direction];
+
+  document.documentElement.classList.remove('no-scroll');
 
   game.resetRecentTiles();
   move();

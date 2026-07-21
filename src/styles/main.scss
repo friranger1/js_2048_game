@@ -198,6 +198,10 @@ h1 {
   height: 150px;
 }
 
+.no-scroll {
+  overflow: hidden;
+}
+
 @keyframes appear {
   from {
     transform: scale(0);
