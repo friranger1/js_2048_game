@@ -132,6 +132,7 @@ gameField.addEventListener('touchstart', (mobileEvent) => {
 });
 
 gameField.addEventListener('touchend', (mobileEvent) => {
+  document.documentElement.classList.remove('no-scroll');
   endX = mobileEvent.changedTouches[0].clientX;
   endY = mobileEvent.changedTouches[0].clientY;
 
@@ -169,8 +170,6 @@ gameField.addEventListener('touchend', (mobileEvent) => {
   let boardChanged = false;
 
   const move = moves[direction];
-
-  document.documentElement.classList.remove('no-scroll');
 
   game.resetRecentTiles();
   move();
