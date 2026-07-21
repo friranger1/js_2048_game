@@ -131,6 +131,14 @@ gameField.addEventListener('touchstart', (mobileEvent) => {
   startY = mobileEvent.touches[0].clientY;
 });
 
+gameField.addEventListener(
+  'touchmove',
+  (eventMove) => {
+    eventMove.preventDefault();
+  },
+  { passive: false },
+);
+
 gameField.addEventListener('touchend', (mobileEvent) => {
   document.documentElement.classList.remove('no-scroll');
   endX = mobileEvent.changedTouches[0].clientX;
